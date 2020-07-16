@@ -4,7 +4,7 @@ This repository contains a Go client for interacting with Twitch IRC channels.
 
 # Example
 
-main.go contains the following example, which will receive each message in my channel and log information about it, and the user who sent it to the console.
+main.go contains the following example which will receive each message in my channel (supcole) and log information about it and the user who sent it to the console. To be able to run this, you must have Twitch API credentials.
 
 ```go
 
