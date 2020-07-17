@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Message represents message sent
+// Message represents message received
 type Message struct {
 	channel  string
 	user     User

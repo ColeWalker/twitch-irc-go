@@ -1,10 +1,11 @@
-package main
+package twitchgoirc
 
 import (
 	"bufio"
 	"fmt"
 	"net"
 	"net/textproto"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -18,7 +19,7 @@ type Bot struct {
 	// nickname of bot
 	nick string
 	// channel to join - #username format
-	channel string
+	channels []string
 	// mods of channel -> currently unused
 	mods map[string]bool
 	// connection to irc
@@ -26,24 +27,22 @@ type Bot struct {
 	// oauth token containing chat:read and chat:write scopes
 	AuthToken string
 	// Event listeners
-	onMessage map[string]chan Message
+	onMessage chan *Message
 }
 
 //constructor
-func newBot(token string, channel string, nick string) *Bot {
-	defaultChannel := make(chan Message)
-	onMessage := make(map[string]chan Message)
+func newBot(token string, channels []string, nick string) *Bot {
+	defaultChannel := make(chan *Message)
 
-	onMessage["default"] = defaultChannel
 	return &Bot{
 		server:    "irc.twitch.tv",
 		port:      "6667",
 		nick:      nick,
-		channel:   channel,
+		channels:  channels,
 		mods:      make(map[string]bool),
 		conn:      nil,
 		AuthToken: token,
-		onMessage: onMessage}
+		onMessage: defaultChannel}
 }
 
 //Connect and connect bot to IRC server
@@ -66,13 +65,16 @@ func (bot *Bot) Connect() {
 		bot.Connect()
 	}
 
-	fmt.Printf("Connected to IRC server %s\n", bot.server)
+	fmt.Printf("Connected to IRC server %s\n\n", bot.server)
 
 	// Initial pings need to be set
 	fmt.Fprintf(bot.conn, "USER %s 8 * :%s\r\n", bot.nick, bot.nick)
 	fmt.Fprintf(bot.conn, "PASS oauth:%s\r\n", bot.AuthToken)
 	fmt.Fprintf(bot.conn, "NICK %s\r\n", bot.nick)
-	fmt.Fprintf(bot.conn, "JOIN %s\r\n", bot.channel)
+	for _, v := range bot.channels {
+		fmt.Fprintf(bot.conn, "JOIN %s\r\n", v)
+	}
+
 	fmt.Fprintf(bot.conn, "CAP REQ :twitch.tv/membership\r\n")
 	fmt.Fprintf(bot.conn, "CAP REQ :twitch.tv/tags\r\n")
 
@@ -80,11 +82,14 @@ func (bot *Bot) Connect() {
 }
 
 //Message to IRC channel
-func (bot *Bot) Message(message string) {
-	if message != "" {
-		fmt.Fprintf(bot.conn, "PRIVMSG "+bot.channel+" :"+message+"\r\n")
+func (bot *Bot) Message(channel string, message string) {
+	if channel[0] != '#' {
+		channel = "#" + channel
 	}
-	fmt.Println("PRIVMSG " + bot.channel + " :" + message + "\r\n")
+	if message != "" {
+		fmt.Fprintf(bot.conn, "PRIVMSG "+channel+" :"+message+"\r\n")
+	}
+
 }
 
 //ReadLoop for Bot
@@ -101,9 +106,14 @@ func (bot *Bot) ReadLoop() {
 			break
 		} else if strings.Contains(line, "PING") {
 			fmt.Fprintf(bot.conn, "PONG :tmi.twitch.tv")
-		} else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG "+bot.channel) {
-			message := parseMessage(line, bot.channel)
-			bot.onMessage["default"] <- *message
+		} else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG "+"#") {
+			lineAndChannel := strings.Split(line, "PRIVMSG ")
+			channelRegex := regexp.MustCompile(`#\S+`)
+			channel := channelRegex.FindString(lineAndChannel[1])
+
+			message := parseMessage(line, channel)
+			bot.onMessage <- message
+
 		}
 	}
 
