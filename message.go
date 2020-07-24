@@ -1,4 +1,4 @@
-package twitchgoirc
+package twitchircgo
 
 import (
 	"strconv"
