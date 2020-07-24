@@ -1,3 +1,3 @@
-module github.com/ColeWalker/twitch-irc-go/twitchircgo
+module github.com/ColeWalker/twitchircgo
 
 go 1.14
