@@ -7,27 +7,35 @@ import (
 
 // Message represents message received
 type Message struct {
-	channel  string
-	user     User
-	contents string
+	Channel  string
+	User     User
+	Contents string
 }
 
 // User represents user sending message
 type User struct {
-	username   string
-	moderator  bool
-	badges     []Badge
-	id         string
-	color      string
-	subscriber bool
-	turbo      bool
-	owner      bool
+	// Username of sender
+	Username string
+	// Moderator is true if sender is a Moderator
+	Moderator bool
+	// Badges contains user's badges
+	Badges []Badge
+	// ID represents the unique user id (static where username can change)
+	ID string
+	// Color represents the user's chosen chat color
+	Color string
+	// Subscriber represents whether user is subbed to channel
+	Subscriber bool
+	// Turbo represents whether user is a Turbo user
+	Turbo bool
+	// Owner represents whether user is the owner of the channel, owners are NOT moderators
+	Owner bool
 }
 
 // Badge represents badges sent in twitch chat
 type Badge struct {
-	name  string
-	value string
+	Name  string
+	Value string
 }
 
 func userFromTags(tags []string, channel string) *User {
@@ -54,10 +62,10 @@ func userFromTags(tags []string, channel string) *User {
 		badgeInfo := strings.Split(v, "/")
 		if len(badgeInfo) > 1 {
 			badge := &Badge{
-				name:  badgeInfo[0],
-				value: badgeInfo[1]}
+				Name:  badgeInfo[0],
+				Value: badgeInfo[1]}
 
-			badges = append(badges, *badge)
+			badges = append(Badges, *badge)
 		}
 
 	}
@@ -75,14 +83,14 @@ func userFromTags(tags []string, channel string) *User {
 	isOwner := (strings.ToLower(tagMap["display-name"]) == strings.TrimPrefix(channel, "#"))
 
 	return &User{
-		username:   tagMap["display-name"],
-		moderator:  isMod,
-		badges:     badges,
-		id:         tagMap["user-id"],
-		color:      tagMap["color"],
-		owner:      isOwner,
-		subscriber: isSubscriber,
-		turbo:      isTurbo}
+		Username:   tagMap["display-name"],
+		Moderator:  isMod,
+		Badges:     badges,
+		ID:         tagMap["user-id"],
+		Color:      tagMap["color"],
+		Owner:      isOwner,
+		Subscriber: isSubscriber,
+		Turbo:      isTurbo}
 }
 
 func parseMessage(message string, channel string) *Message {
@@ -105,7 +113,7 @@ func parseMessage(message string, channel string) *Message {
 	user := userFromTags(tags, channel)
 
 	return &Message{
-		channel:  channel,
-		contents: contents,
-		user:     *user}
+		Channel:  channel,
+		Contents: contents,
+		User:     *user}
 }
