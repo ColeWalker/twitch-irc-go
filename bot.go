@@ -42,7 +42,7 @@ func NewBot(token string, channels []string, nick string) *Bot {
 		mods:      make(map[string]bool),
 		conn:      nil,
 		AuthToken: token,
-		onMessage: defaultChannel}
+		OnMessage: defaultChannel}
 }
 
 //Connect and connect bot to IRC server
@@ -112,7 +112,7 @@ func (bot *Bot) ReadLoop() {
 			channel := channelRegex.FindString(lineAndChannel[1])
 
 			message := parseMessage(line, channel)
-			bot.onMessage <- message
+			bot.OnMessage <- message
 
 		}
 	}
