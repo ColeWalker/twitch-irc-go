@@ -10,11 +10,11 @@ main.go contains the following example which will receive each message in my cha
 
 chatToken := refreshAuth("refresh token goes here","client id goes here", "client secret goes here")
 
-bot := newBot(chatToken, "#supcole", "supcole")
+bot := newBot(chatToken, []string{"#channel", "#anotherchannel"}, "botusername")
 bot.Connect()
 
 for {
-    message := <-bot.onMessage["default"]
+    message := <-bot.OnMessage
     fmt.Printf("got message %+v\n",message)
 }
 
