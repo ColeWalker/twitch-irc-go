@@ -30,7 +30,7 @@ type Bot struct {
 	OnMessage chan *Message
 }
 
-//constructor
+// NewBot is a Bot constructor
 func NewBot(token string, channels []string, nick string) *Bot {
 	defaultChannel := make(chan *Message)
 
