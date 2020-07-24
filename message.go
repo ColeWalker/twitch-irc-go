@@ -65,7 +65,7 @@ func userFromTags(tags []string, channel string) *User {
 				Name:  badgeInfo[0],
 				Value: badgeInfo[1]}
 
-			badges = append(Badges, *badge)
+			badges = append(badges, *badge)
 		}
 
 	}
