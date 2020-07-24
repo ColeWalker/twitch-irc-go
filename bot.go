@@ -27,7 +27,7 @@ type Bot struct {
 	// oauth token containing chat:read and chat:write scopes
 	AuthToken string
 	// Event listeners
-	onMessage chan *Message
+	OnMessage chan *Message
 }
 
 //constructor
