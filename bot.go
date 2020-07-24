@@ -31,7 +31,7 @@ type Bot struct {
 }
 
 //constructor
-func newBot(token string, channels []string, nick string) *Bot {
+func NewBot(token string, channels []string, nick string) *Bot {
 	defaultChannel := make(chan *Message)
 
 	return &Bot{
