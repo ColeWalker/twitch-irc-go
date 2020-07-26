@@ -8,7 +8,7 @@ main.go contains the following example which will receive each message in my cha
 
 ```go
 
-chatToken := refreshAuth("refresh token goes here","client id goes here", "client secret goes here")
+chatToken := twitchircgo.RefreshAuth("refresh token goes here","client id goes here", "client secret goes here")
 
 bot := newBot(chatToken, []string{"#channel", "#anotherchannel"}, "botusername")
 bot.Connect()
@@ -20,3 +20,6 @@ for {
 
 
 ```
+
+Messages in the above code segment are sent to the channel OnMessage, and saved to a local variable.
+Message objects contain user information and the contents of the message itself.
